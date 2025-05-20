@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import EmojiPanel from '../src/components/EmojiPanel';
 
 interface Emoji {
   x: number;
@@ -13,13 +14,30 @@ interface Emoji {
 
 export default function Home() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const emojis = useRef<Emoji[]>([
+  const [emojis, setEmojis] = useState<Emoji[]>([
     { x: 100, y: 100, dx: 2, dy: 2, size: 80, emoji: '😊' },
     { x: 300, y: 200, dx: -3, dy: 3, size: 100, emoji: '❤️' },
     { x: 500, y: 150, dx: 3, dy: -2, size: 90, emoji: '✨' },
     { x: 200, y: 400, dx: -2, dy: -3, size: 70, emoji: '🌟' },
     { x: 600, y: 300, dx: 2, dy: 2, size: 85, emoji: '🥰' },
   ]);
+
+  const handleEmojiSelect = (emoji: string) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    // Add new emoji with random position and movement
+    const newEmoji: Emoji = {
+      x: Math.random() * (canvas.width - 100),
+      y: Math.random() * (canvas.height - 100),
+      dx: (Math.random() - 0.5) * 4,
+      dy: (Math.random() - 0.5) * 4,
+      size: 80 + Math.random() * 40,
+      emoji,
+    };
+
+    setEmojis(prev => [...prev, newEmoji]);
+  };
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -39,7 +57,7 @@ export default function Home() {
     const animate = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      emojis.current.forEach(emoji => {
+      emojis.forEach(emoji => {
         // Update position
         emoji.x += emoji.dx;
         emoji.y += emoji.dy;
@@ -65,10 +83,11 @@ export default function Home() {
     return () => {
       window.removeEventListener('resize', resizeCanvas);
     };
-  }, []);
+  }, [emojis]);
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-purple-500 to-pink-500">
+      <EmojiPanel onEmojiSelect={handleEmojiSelect} />
       <canvas
         ref={canvasRef}
         className="w-full h-full"

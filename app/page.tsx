@@ -10,6 +10,8 @@ interface Emoji {
   dy: number;
   size: number;
   emoji: string;
+  popping?: boolean;
+  popStart?: number;
 }
 
 export default function Home() {
@@ -44,6 +46,27 @@ export default function Home() {
     setEmojis(defaultEmojis);
   };
 
+  // Add this function to handle popping emojis
+  const handleCanvasClick = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    for (let i = emojis.length - 1; i >= 0; i--) {
+      const emoji = emojis[i];
+      const emojiCenterX = emoji.x + emoji.size / 2;
+      const emojiCenterY = emoji.y + emoji.size / 2;
+      const radius = emoji.size / 2;
+      if (Math.pow(x - emojiCenterX, 2) + Math.pow(y - emojiCenterY, 2) <= Math.pow(radius, 2)) {
+        // Animate pop instead of instant remove
+        setEmojis(prev => prev.map((em, idx) => idx === i ? { ...em, popping: true, popStart: Date.now() } : em));
+        break;
+      }
+    }
+  };
+
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -59,34 +82,60 @@ export default function Home() {
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
 
+    let animationFrameId: number;
+    const POP_DURATION = 220; // ms
+
     const animate = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      emojis.forEach(emoji => {
-        // Update position
-        emoji.x += emoji.dx;
-        emoji.y += emoji.dy;
-
-        // Bounce off walls
-        if (emoji.x <= 0 || emoji.x + emoji.size >= canvas.width) {
-          emoji.dx *= -1;
+      const now = Date.now();
+      let needsUpdate = false;
+      emojis.forEach((emoji, idx) => {
+        let scale = 1;
+        let opacity = 1;
+        if (emoji.popping && emoji.popStart) {
+          const elapsed = now - emoji.popStart;
+          const t = Math.min(elapsed / POP_DURATION, 1);
+          // Only shrink: scale from 1 to 0
+          scale = 1 - t;
+          // Opacity stays at 1 until last 20%, then fades out
+          if (t > 0.8) {
+            opacity = 1 - (t - 0.8) / 0.2;
+          }
+          if (elapsed >= POP_DURATION) {
+            setEmojis(prev => prev.filter((_, i) => i !== idx));
+            needsUpdate = true;
+            return;
+          }
         }
-        if (emoji.y <= 0 || emoji.y + emoji.size >= canvas.height) {
-          emoji.dy *= -1;
+        // Update position only if not popping
+        if (!emoji.popping) {
+          emoji.x += emoji.dx;
+          emoji.y += emoji.dy;
+          if (emoji.x <= 0 || emoji.x + emoji.size >= canvas.width) {
+            emoji.dx *= -1;
+          }
+          if (emoji.y <= 0 || emoji.y + emoji.size >= canvas.height) {
+            emoji.dy *= -1;
+          }
         }
-
-        // Draw emoji
-        ctx.font = `${emoji.size}px Arial`;
-        ctx.fillText(emoji.emoji, emoji.x, emoji.y + emoji.size);
+        ctx.save();
+        ctx.globalAlpha = opacity;
+        ctx.font = `${emoji.size * scale}px Arial`;
+        ctx.translate(emoji.x + emoji.size / 2, emoji.y + emoji.size / 2);
+        ctx.scale(scale, scale);
+        ctx.fillText(emoji.emoji, -emoji.size / 2, emoji.size / 2);
+        ctx.restore();
       });
-
-      requestAnimationFrame(animate);
+      if (!needsUpdate) {
+        animationFrameId = requestAnimationFrame(animate);
+      }
     };
 
     animate();
 
     return () => {
       window.removeEventListener('resize', resizeCanvas);
+      cancelAnimationFrame(animationFrameId);
     };
   }, [emojis]);
 
@@ -120,6 +169,7 @@ export default function Home() {
       <canvas
         ref={canvasRef}
         className="w-full h-full"
+        onClick={handleCanvasClick}
       />
     </main>
   );

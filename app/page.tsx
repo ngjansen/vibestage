@@ -86,7 +86,7 @@ export default function Home() {
   }, [emojis]);
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-purple-500 to-pink-500">
+    <main className="min-h-screen bg-gradient-to-br from-purple-500 to-pink-500 pb-20">
       <EmojiPanel onEmojiSelect={handleEmojiSelect} />
       <canvas
         ref={canvasRef}

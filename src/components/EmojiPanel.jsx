@@ -12,7 +12,7 @@ const EmojiBarContainer = styled.div`
   flex-wrap: nowrap;
   justify-content: flex-start;
   align-items: center;
-  padding: 10px 0;
+  padding: 8px 0;
   z-index: 1000;
   box-shadow: 0 -2px 8px rgba(0,0,0,0.04);
   overflow-x: auto;
@@ -28,8 +28,8 @@ const EmojiBarContainer = styled.div`
 const EmojiButton = styled.button`
   background: none;
   border: none;
-  font-size: 1rem;
-  padding: 0 10px;
+  font-size: 1.6rem;
+  padding: 0 8px;
   cursor: pointer;
   outline: none;
   transition: transform 0.1s;
@@ -37,6 +37,22 @@ const EmojiButton = styled.button`
   &:active {
     transform: scale(1.2);
     background: #f0f0f0;
+  }
+`;
+
+const RefreshButton = styled.button`
+  background: none;
+  border: none;
+  font-size: 2rem;
+  margin-left: auto;
+  margin-right: 12px;
+  cursor: pointer;
+  outline: none;
+  border-radius: 50%;
+  padding: 4px 10px;
+  transition: background 0.1s;
+  &:hover {
+    background: #f5f5f5;
   }
 `;
 

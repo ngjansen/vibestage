@@ -15,11 +15,11 @@ interface Emoji {
 export default function Home() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [emojis, setEmojis] = useState<Emoji[]>([
-    { x: 100, y: 100, dx: 2, dy: 2, size: 80, emoji: '😊' },
-    { x: 300, y: 200, dx: -3, dy: 3, size: 100, emoji: '❤️' },
-    { x: 500, y: 150, dx: 3, dy: -2, size: 90, emoji: '✨' },
-    { x: 200, y: 400, dx: -2, dy: -3, size: 70, emoji: '🌟' },
-    { x: 600, y: 300, dx: 2, dy: 2, size: 85, emoji: '🥰' },
+    { x: 100, y: 100, dx: 2, dy: 2, size: 40, emoji: '😊' },
+    { x: 300, y: 200, dx: -3, dy: 3, size: 50, emoji: '❤️' },
+    { x: 500, y: 150, dx: 3, dy: -2, size: 45, emoji: '✨' },
+    { x: 200, y: 400, dx: -2, dy: -3, size: 35, emoji: '🌟' },
+    { x: 600, y: 300, dx: 2, dy: 2, size: 42.5, emoji: '🥰' },
   ]);
 
   const handleEmojiSelect = (emoji: string) => {
@@ -28,11 +28,11 @@ export default function Home() {
 
     // Add new emoji with random position and movement
     const newEmoji: Emoji = {
-      x: Math.random() * (canvas.width - 100),
-      y: Math.random() * (canvas.height - 100),
+      x: Math.random() * (canvas.width - 50),
+      y: Math.random() * (canvas.height - 50),
       dx: (Math.random() - 0.5) * 4,
       dy: (Math.random() - 0.5) * 4,
-      size: 80 + Math.random() * 40,
+      size: (80 + Math.random() * 40) * 0.5,
       emoji,
     };
 

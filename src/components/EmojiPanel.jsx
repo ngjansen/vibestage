@@ -9,11 +9,14 @@ const EmojiBarContainer = styled.div`
   background: #fff;
   border-top: 1px solid #eee;
   display: flex;
-  justify-content: space-around;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
   align-items: center;
   padding: 10px 0;
   z-index: 1000;
   box-shadow: 0 -2px 8px rgba(0,0,0,0.04);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
   @media (min-width: 600px) {
     width: 400px;
     left: 50%;
@@ -25,7 +28,7 @@ const EmojiBarContainer = styled.div`
 const EmojiButton = styled.button`
   background: none;
   border: none;
-  font-size: 2rem;
+  font-size: 1rem;
   padding: 0 10px;
   cursor: pointer;
   outline: none;
